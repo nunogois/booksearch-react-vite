@@ -4,8 +4,19 @@ interface Books {
 }
 
 interface Book {
-  id: number
+  id: string
   volumeInfo: {
     title: string
+    authors: string[]
+    categories: string[]
+    pageCount: number
+    publishedDate: string
+    publisher: string
+    description: string
+    averageRating: number
+    imageLinks: {
+      smallThumbnail: string
+    }
+    previewLink: string
   }
 }

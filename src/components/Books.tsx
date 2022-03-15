@@ -11,19 +11,28 @@ async function fetchBooks(
 ) {
   const res = await fetch(
     `${
-      import.meta.env.VITE_API ?? 'http://localhost:5000'
-    }/books?search=${search}&page=${page}&filter=${filter}`
+      import.meta.env.VITE_API ?? 'http://localhost:5001'
+    }/books?search=${encodeURIComponent(search)}&page=${page}&filter=${filter}`
   )
   return res.json()
 }
 
-function Books({ search, filter }: { search: string; filter: string }) {
+interface BooksProps {
+  search?: string
+  filter?: string
+}
+
+function Books({ search = '', filter = '' }: BooksProps) {
   const [page, setPage] = useState(1)
 
   const { data, status, error, isFetching } = useQuery(
     ['books', { search, page, filter }],
     () => fetchBooks(search, page, filter),
-    { keepPreviousData: true, enabled: search.length > 2 }
+    {
+      keepPreviousData: true,
+      enabled: search.length >= 3,
+      refetchOnWindowFocus: false
+    }
   )
 
   if (status === 'loading' || isFetching) {
@@ -43,16 +52,24 @@ function Books({ search, filter }: { search: string; filter: string }) {
   }
 
   if (!data?.items || data?.items?.length === 0) {
-    return (
-      <div className='flex items-center justify-center p-2'>
-        <p>No books found.</p>
-      </div>
-    )
+    if (search.length === 0) {
+      return (
+        <div className='flex items-center justify-center p-2'>
+          <p>Search for books by using the field above.</p>
+        </div>
+      )
+    } else {
+      return (
+        <div className='flex items-center justify-center p-2'>
+          <p>No books found for: {search}.</p>
+        </div>
+      )
+    }
   }
 
   return (
-    <div className='flex flex-col h-[calc(100%-41px)] p-2'>
-      <div className='flex-1'>
+    <div className='flex flex-col h-[calc(100%-41px)]'>
+      <div className='flex-1 overflow-auto px-6'>
         {data?.items?.map((book: Book) => (
           <Book key={book.id} {...book} />
         ))}

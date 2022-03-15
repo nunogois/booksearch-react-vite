@@ -8,7 +8,7 @@ function Pagination({
   total: number
 }) {
   return (
-    <div className='flex justify-center flex-wrap select-none gap-1'>
+    <div className='flex justify-center flex-wrap select-none gap-1 p-2'>
       <button
         className={
           'border border-1 border-gray-300 rounded py-1 w-8 text-sm' +
